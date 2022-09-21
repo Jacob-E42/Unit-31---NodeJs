@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!-- saved from url=(0095)https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Markov</title>
+
+    <link rel="stylesheet" href="./Markov_files/pygments.css" type="text/css">
+    <link rel="stylesheet" href="./Markov_files/handouts-sphinx.css">
+
+    
+    <link href="./Markov_files/css" rel="stylesheet" type="text/css">
+    
+</head>
+<body>
+<div id="page-wrapper">
+    <div id="page-sidebar">
+        <header>
+            <p class="project">Springboard</p>
+
+            <p class="title">Markov</p>
+
+            <p class="backlink"><a href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html"> « Back to Homepage</a></p>
+
+        </header>
+        <div id="toc">
+            <ul>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#">Markov</a><ul>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#markov-machines">Markov Machines</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#step-0-setup">Step 0: Setup</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#step-1-implement-the-markov-machine">Step 1: Implement the Markov Machine</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#step-2-build-the-maketext-js-script">Step 2: Build the <cite>makeText.js</cite> Script</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#further-study">Further Study</a><ul>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#algorithmic-things">Algorithmic Things</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#node-practice-things">Node Practice Things</a></li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#javascript-generator-functions">JavaScript Generator Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/index.html#solution">Solution</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+    </div>
+    <div id="page-content">
+        
+  <div class="section" id="markov">
+<h1>Markov</h1>
+<p><a class="reference external" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov.zip">Download exercise</a></p>
+<p>In this exercise, you’ll use an algorithm for generating realistic machine-made
+text from an original source text.</p>
+<p>For example, if we feed in the source text of “Alice’s Adventures in Wonderland”,
+we might get output like this:</p>
+<blockquote>
+<div>‘You are old,’ said the Dormouse, who was talking. Alice could only see her.
+She is such a new pair of white kid gloves and the blades of grass, but she
+remembered the number of bathing machines in the kitchen that did not like the
+wind, and was just beginning to grow up any more if you’d like it put the
+Dormouse again, so she went nearer to make out that it was certainly English.
+‘I don’t quite understand you,’ she said, ‘for her hair goes in such confusion
+that she was looking down with it.</div></blockquote>
+<p><em>(that text isn’t directly in the source book, but it’s built via an algorithm
+to be similar to the text in the book).</em></p>
+<div class="section" id="markov-machines">
+<h2>Markov Machines</h2>
+<p>A Markov Machine emits output of a “Markov Chain.”</p>
+<p>A Markov Chain is a chain of possible outcomes, given a particular “state”.</p>
+<p>For example, consider the phrase “the cat in the hat is in the hat”. We could build a table of
+each word in this phrase, along with the word that comes after that phrase:</p>
+<table border="1" class="docutils align-default">
+<colgroup>
+<col width="44%">
+<col width="56%">
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>the</td>
+<td>cat, hat, hat</td>
+</tr>
+<tr class="row-even"><td>cat</td>
+<td>in</td>
+</tr>
+<tr class="row-odd"><td>in</td>
+<td>the, the</td>
+</tr>
+<tr class="row-even"><td>hat</td>
+<td>is, <cite>null</cite></td>
+</tr>
+<tr class="row-odd"><td>is</td>
+<td>in</td>
+</tr>
+</tbody>
+</table>
+<p>To emit realistic-but-random text, we could pick a starting word randomly
+(say, “in”). Then we would:</p>
+<ol class="arabic simple">
+<li>find all words that can come after that word</li>
+<li>pick one of those next-words randomly</li>
+<li>if we picked <cite>null</cite>, we’ve reached the end of the chain, so stop</li>
+<li>otherwise, restart at step 1</li>
+</ol>
+<p>For example, from that simple phrase, we could find:</p>
+<ul class="simple">
+<li>“in the cat in the hat”</li>
+<li>“in the hat is in the hat”</li>
+<li>“in the cat in the cat in the cat in the hat”</li>
+</ul>
+</div>
+<div class="section" id="step-0-setup">
+<h2>Step 0: Setup</h2>
+<ul class="simple">
+<li>Make a project, a Git repo, and a <cite>package.json</cite></li>
+<li>Add <cite>node_modules</cite> to your <cite>.gitignore</cite></li>
+</ul>
+</div>
+<div class="section" id="step-1-implement-the-markov-machine">
+<h2>Step 1: Implement the Markov Machine</h2>
+<p>We’ve given you the start of an object-oriented Markov machine:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">markov.js</span></div>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="cm">/** Textual markov chain generator */</span>
+
+
+<span class="kr">class</span> <span class="nx">MarkovMachine</span> <span class="p">{</span>
+
+  <span class="cm">/** build markov machine; read in text.*/</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/[ \r\n]+/</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">words</span> <span class="o">=</span> <span class="nx">words</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">c</span> <span class="p">=&gt;</span> <span class="nx">c</span> <span class="o">!==</span> <span class="s2">""</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">makeChains</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="cm">/** set markov chains:</span>
+<span class="cm">   *</span>
+<span class="cm">   *  for text of "the cat in the hat", chains will be</span>
+<span class="cm">   *  {"the": ["cat", "hat"], "cat": ["in"], "in": ["the"], "hat": [null]} */</span>
+
+  <span class="nx">makeChains</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// TODO</span>
+  <span class="p">}</span>
+
+
+  <span class="cm">/** return random text from chains */</span>
+
+  <span class="nx">makeText</span><span class="p">(</span><span class="nx">numWords</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// TODO</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The <cite>constructor</cite> function contains some code to get you started—given some
+input text, it splits it on spaces and linebreak characters to make a list
+of words. It then calls the (unimplemented) function which builds a map of
+chains of <em>word</em> → <em>possible-next-words</em>.</p>
+<p>You should be able to instantiate it like this:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">mm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MarkovMachine</span><span class="p">(</span><span class="s2">"the cat in the hat"</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then, whenever you want to get generated text from it:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="nx">mm</span><span class="p">.</span><span class="nx">makeText</span><span class="p">();</span>
+
+<span class="nx">mm</span><span class="p">.</span><span class="nx">makeText</span><span class="p">(</span><span class="nx">numWords</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Test this in the Node REPL before continuing!</strong> We’ve given you some
+text files to play with; you can feed these (or parts of these) into your
+machine to make sure it works.</p>
+<ul class="simple">
+<li>Write tests — which is tricky, since this algorithm is inherently
+random. There are things you can test, though — what are they?</li>
+</ul>
+</div>
+<div class="section" id="step-2-build-the-maketext-js-script">
+<h2>Step 2: Build the <cite>makeText.js</cite> Script</h2>
+<p>We want a script, <cite>makeText.js</cite>, that works like this:</p>
+<pre class="console literal-block">$ <span class="cmd">node makeText.js file eggs.txt</span>
+... generated text from file 'eggs.txt' ...
+
+$ <span class="cmd">node makeText.js url http://www.gutenberg.org/files/11/11-0.txt</span>
+... generated text from that URL ...
+</pre>
+<p>Make sure it handles errors (can’t read file or can’t read URL) by
+printing a nice and complete error message and quitting program.</p>
+</div>
+<div class="section" id="further-study">
+<h2>Further Study</h2>
+<p>There are lots of things you could think of to improve your machine;
+feel free to pick other things:</p>
+<div class="section" id="algorithmic-things">
+<h3>Algorithmic Things</h3>
+<ul>
+<li><p class="first">Have the machine only start on a capitalized word (or better still: a
+word that starts a sentence); this will give you more realistic output
+text.</p>
+</li>
+<li><p class="first">Have the machine stop at a period, while still honoring the maximum
+number of words passed in.</p>
+</li>
+<li><p class="first">Right now, the “state” of your Markov chain is a single word.
+This generates quite random-sounding text. You can get better text
+if you deal with <em>bigrams</em> — two words at a time. So, you keep track
+of the two words most recently emitted, and what word could follow that.
+For the phrase “the cat in the hat is in the hat”, this could look like:</p>
+<table border="1" class="docutils align-default">
+<colgroup>
+<col width="43%">
+<col width="57%">
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>the cat</td>
+<td>in</td>
+</tr>
+<tr class="row-even"><td>cat in</td>
+<td>the</td>
+</tr>
+<tr class="row-odd"><td>in the</td>
+<td>hat, hat</td>
+</tr>
+<tr class="row-even"><td>the hat</td>
+<td>is, <cite>null</cite></td>
+</tr>
+<tr class="row-odd"><td>hat is</td>
+<td>in</td>
+</tr>
+<tr class="row-even"><td>is in</td>
+<td>the</td>
+</tr>
+</tbody>
+</table>
+<p>With longer text, this can produce quite realistic output text.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="node-practice-things">
+<h3>Node Practice Things</h3>
+<ul class="simple">
+<li>If you give this a URL that returns HTML, you’ll get HTML mixed into the
+output text. Find a library in NPM that can strip out HTML and use this.</li>
+<li>Let the user passing multiple files and/or URLs and make a machine that
+mixes together that text.</li>
+</ul>
+</div>
+<div class="section" id="javascript-generator-functions">
+<h3>JavaScript Generator Functions</h3>
+<p>So far, your Markov machines have generated all their text at once. It could be
+useful, though, to make a machine that generates text on demand, word-by-word,
+never doing more work than needed.</p>
+<p>JavaScript has <em>generator functions</em> which can <em>yield</em> output on demand. This
+would allow your machine to be asked to produce output word-by-word.</p>
+<p>To do this, you’ll need to do some research on generator functions and the
+<cite>yield</cite> keyword.</p>
+</div>
+</div>
+<div class="section" id="solution">
+<h2>Solution</h2>
+<p><a class="reference external" href="https://curric.springboard.com/software-engineering-career-track/default/exercises/node-markov/solution/index.html">View our Solution</a></p>
+</div>
+</div>
+
+
+
+    </div>
+</div>
+<script type="text/javascript" src="./Markov_files/jquery.js.download"></script>
+<script type="text/javascript" src="./Markov_files/underscore.js.download"></script>
+<script type="text/javascript" src="./Markov_files/doctools.js.download"></script>
+<script type="text/javascript" src="./Markov_files/language_data.js.download"></script> 
+
+</body></html>
