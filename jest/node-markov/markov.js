@@ -8,6 +8,7 @@ class MarkovMachine {
   constructor(text) {
     let words = text.split(/[ \r\n]+/);
     this.words = words.filter(c => c !== "");
+    this.chains = {};
     this.makeChains();
   }
 
@@ -17,13 +18,44 @@ class MarkovMachine {
    *  {"the": ["cat", "hat"], "cat": ["in"], "in": ["the"], "hat": [null]} */
 
   makeChains() {
-    // TODO
+    for (let i = 0; i < this.words.length; i++){
+      let word  = this.words[i];
+      let nextWord = this.words[i + 1] ? this.words[i + 1] : null;
+      if (!(word in this.chains)){
+        this.chains[word] = [];
+        this.chains[word].push(nextWord);
+      }
+      else{
+        this.chains[word].push(nextWord);
+      }
+    }
   }
+
+
 
 
   /** return random text from chains */
 
   makeText(numWords = 100) {
-    // TODO
+    let returnText = "";
+
+    let nextWords = Object.keys(this.chains);
+    let nextIndex = Math.floor(Math.random() * nextWords.length);
+    let nextWord = nextWords[nextIndex];
+
+    for (let i = 0; i < numWords; i++){
+      returnText += " " + nextWord;
+      nextWords = this.chains[nextWord];
+      nextIndex = Math.floor(Math.random() * nextWords.length);
+      nextWord = nextWords[nextIndex];
+      if (nextWord === null) break;
+    }
+    
+    return returnText;
   }
 }
+
+module.exports ={
+  MarkovMachine:MarkovMachine
+};
+
