@@ -19,13 +19,12 @@ class MarkovMachine {
 
   makeChains() {
     for (let i = 0; i < this.words.length; i++){
-      let word  = this.words[i];
-      let nextWord = this.words[i + 1] ? this.words[i + 1] : null;
+      const word  = this.words[i];
+      const nextWord = this.words[i + 1] ? this.words[i + 1] : null;
       if (!(word in this.chains)){
         this.chains[word] = [];
         this.chains[word].push(nextWord);
-      }
-      else{
+      } else {
         this.chains[word].push(nextWord);
       }
     }
@@ -44,6 +43,7 @@ class MarkovMachine {
     let nextWord = nextWords[nextIndex];
 
     for (let i = 0; i < numWords; i++){
+      // TODO: only add a space if i != 0
       returnText += " " + nextWord;
       nextWords = this.chains[nextWord];
       nextIndex = Math.floor(Math.random() * nextWords.length);

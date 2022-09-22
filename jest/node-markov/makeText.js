@@ -26,11 +26,13 @@ async function webCat(url) {
         handleOutPut(resp.data)
     } catch (err) {
         console.log("Error fetching ", err.hostname)
-        process.exit(404)
+        process.exit(1)
     }
 }
 
 function parsePath() {
+    // TODO: use a CLI argument parser to help parse/validate args
+    // https://openbase.com/categories/js/best-nodejs-cli-arguments-libraries
     let sourceType = process.argv[2];
     let source = process.argv[3];
     
